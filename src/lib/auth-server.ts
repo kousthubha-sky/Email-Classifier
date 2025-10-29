@@ -2,6 +2,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { getAuthDatabaseSync } from "@/lib/mongodb";
+
 /**
  * Server-side utility to get authenticated user session
  * Redirects to login if no session exists
@@ -43,12 +44,27 @@ export async function getOptionalServerSession() {
 export async function getGoogleAccessToken(userId: string) {
   try {
     const db = getAuthDatabaseSync();
-    const account = await db.collection("accounts").findOne({
+    
+    // Try with providerId first (Better Auth v1)
+    let account = await db.collection("accounts").findOne({
       userId: userId,
-      provider: "google"
+      providerId: "google"
     });
 
-    return account?.access_token || null;
+    // Fallback to provider field (older versions)
+    if (!account) {
+      account = await db.collection("accounts").findOne({
+        userId: userId,
+        provider: "google"
+      });
+    }
+
+    console.log("Getting access token for user:", userId);
+    console.log("Account found:", !!account);
+    console.log("Access token exists:", !!(account?.accessToken || account?.access_token));
+
+    // Check both possible field names
+    return account?.accessToken || account?.access_token || null;
   } catch (error) {
     console.error("Error getting Google access token:", error);
     return null;

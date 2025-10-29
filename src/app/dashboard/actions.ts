@@ -1,35 +1,46 @@
 "use server";
 
-import { headers } from "next/headers";
-import { auth } from "@/lib/auth";
 import { GmailClient, type Email } from "@/lib/gmail-client";
 import { OpenAIClient } from "@/lib/openai-client";
-
-type AuthUser = {
-  id: string;
-  email: string;
-  name?: string;
-  picture?: string;
-  accessToken?: string;
-};
+import { getServerSession } from "@/lib/auth-server";
+import { getAuthDatabaseSync } from "@/lib/mongodb";
+import { ObjectId } from "mongodb";
 
 export async function fetchAndClassifyEmails(openaiApiKey: string) {
   try {
-    // Get user session
-    const session = await auth.api.getSession({
-      headers: await headers()
-    });
+    // Get server session
+    const session = await getServerSession();
 
-    if (!session?.user) {
+    if (!session?.user?.id) {
       throw new Error("Not authenticated");
     }
 
-    // Get access token from session
-    const accessToken = (session.user as AuthUser).accessToken;
+    // Get Google access token from database with both string and ObjectId
+    const db = getAuthDatabaseSync();
     
-    if (!accessToken) {
-      throw new Error("No Google access token available");
+    let userIdObjectId;
+    try {
+      userIdObjectId = new ObjectId(session.user.id);
+    } catch {
+      userIdObjectId = null;
     }
+
+    const account = await db.collection("account").findOne({
+      $or: [
+        { userId: session.user.id, providerId: "google" },
+        { userId: userIdObjectId, providerId: "google" }
+      ]
+    });
+
+    const accessToken = account?.accessToken;
+
+    if (!accessToken) {
+      console.error("No access token found for user:", session.user.id);
+      console.error("Account found:", !!account);
+      throw new Error("No Google access token available. Please sign out and sign in with Google again.");
+    }
+
+    console.log("Access token found, fetching emails...");
 
     // Fetch emails
     const gmailClient = new GmailClient(accessToken);
@@ -38,6 +49,8 @@ export async function fetchAndClassifyEmails(openaiApiKey: string) {
     if (emails.length === 0) {
       throw new Error("No emails found or access denied");
     }
+
+    console.log(`Fetched ${emails.length} emails, starting classification...`);
 
     // Classify emails
     const openaiClient = new OpenAIClient(openaiApiKey);
@@ -53,6 +66,8 @@ export async function fetchAndClassifyEmails(openaiApiKey: string) {
         reasoning: classifications[index]?.reasoning || 'Classification not available'
       }
     }));
+
+    console.log(`Successfully classified ${results.length} emails`);
 
     return results;
   } catch (error) {
