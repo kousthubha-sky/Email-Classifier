@@ -99,6 +99,15 @@ export default function DashboardPage() {
     }
   }, []);
 
+  // Redirect to login when there's no session (do it in an effect to avoid updating
+  // the router during render — this caused the "Cannot update a component (Router) while
+  // rendering a different component (DashboardPage)" error).
+  useEffect(() => {
+    if (!session && !sessionLoading) {
+      router.push('/auth/login');
+    }
+  }, [session, sessionLoading, router]);
+
   const handleApiKeySave = (key: string) => {
     setOpenaiKey(key);
     localStorage.setItem("openai_api_key", key);
@@ -175,7 +184,6 @@ export default function DashboardPage() {
   }
 
   if (!session) {
-    router.push('/auth/login');
     return null;
   }
 
