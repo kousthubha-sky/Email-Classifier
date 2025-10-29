@@ -48,7 +48,7 @@ See `.env.example` for a full list. Minimal required variables for local develop
 - MONGODB_URI — MongoDB connection string (e.g. `mongodb://localhost:27017`)
 - MONGODB_DB — Database name (optional if included in URI)
 - NEXT_PUBLIC_AUTH_URL — e.g. `http://localhost:3000`
-- BETTER_AUTH_SECRET — A strong secret (>= 32 chars)
+- BETTER_AUTH_SECRET — A strong secret (>= 32 chars)(Can be generated from BetterAuth site or any other AI to generate 32 chars secret)
 
 Example (in `.env.local`):
 
@@ -84,7 +84,7 @@ npm run lint
 Prettier or other formatters may be configured in the repo — follow existing configuration.
 
 ## Tests
-
+There's single script for testing the API from OpenRouters free model you have to use Your own key for that too
 There are no automated tests included by default. If you add tests, prefer the repository's existing tooling and add an npm script (e.g. `test`).
 
 ## Deployment
