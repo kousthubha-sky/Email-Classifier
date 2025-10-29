@@ -1,131 +1,173 @@
 # Better Auth MongoDB Demo
 
-A modern authentication template built with Next.js, Better Auth, and MongoDB. Features user registration, authentication, and a full-featured todo application demonstrating CRUD operations with MongoDB.
+A modern authentication template built with Next.js, Better Auth, and MongoDB. It includes user registration, authentication (email/password and GitHub OAuth), and a todo application demonstrating CRUD operations with MongoDB.
 
-## Features
+## Quick start — for contributors
 
-- 🔐 **Authentication**: Complete auth system with Better Auth
-  - Email/password registration and login
-  - GitHub OAuth support (configurable)
-  - Session management with middleware protection
-- 🍃 **MongoDB Integration**: Full MongoDB adapter for Better Auth
-  - User and session storage
-  - Todo CRUD operations
-- 🎨 **Modern UI**: Built with shadcn/ui components
-  - Responsive design
-  - Dark/light theme support
-  - Beautiful, accessible components
-- ✅ **Todo Management**: Complete todo application
-  - Create, read, update, delete todos
-  - Toggle completion status
-  - User-specific todos with authentication
+These steps get a developer up and running locally within minutes.
 
-## Tech Stack
-
-- **Framework**: Next.js 15 with App Router
-- **Authentication**: Better Auth with MongoDB adapter
-- **Database**: MongoDB
-- **Styling**: TailwindCSS + shadcn/ui
-- **TypeScript**: Full type safety
-- **UI Components**: Radix UI + Lucide icons
-
-## Getting Started
-
-### Prerequisites
-
-- Node.js 18+ 
-- MongoDB database (local or Atlas)
-
-### Environment Variables
-
-Create a `.env.local` file in the root directory (see `.env.example` for reference):
+1. Clone the repo:
 
 ```bash
-# MongoDB Configuration
-MONGODB_URI=mongodb://localhost:27017
-MONGODB_DB=better-auth
-
-# Better Auth Configuration
-NEXT_PUBLIC_AUTH_URL=http://localhost:3000
-BETTER_AUTH_SECRET=your-secure-secret-key-here-minimum-32-characters
-
-# GitHub OAuth (required for social login)
-GITHUB_CLIENT_ID=your-github-client-id
-GITHUB_CLIENT_SECRET=your-github-client-secret
+git clone https://github.com/kousthubha-sky/Email-Classifier.git
+cd Email-Classifier/better/better-auth-mongodb
 ```
 
-### Installation & Development
+2. Install dependencies (npm or yarn):
 
-1. Clone the repository and install dependencies:
 ```bash
 npm install
+# or
+yarn install
 ```
 
-2. Start the development server:
+3. Copy environment variable template and update values:
+
+```bash
+cp .env.example .env.local
+```
+
+Open `.env.local` and fill in the values for `MONGODB_URI`, `BETTER_AUTH_SECRET`, and any OAuth client IDs/secrets you need (e.g. GitHub).
+
+4. Start the dev server:
+
 ```bash
 npm run dev
 ```
 
-3. Open [http://localhost:3000](http://localhost:3000) in your browser
+Then open http://localhost:3000.
 
-## Project Structure
+Notes:
+- This project targets Node.js 18+. Use nvm/n to switch if needed.
+- If you prefer pnpm, `pnpm install` and prefix scripts with `pnpm`.
+
+## Environment variables
+
+See `.env.example` for a full list. Minimal required variables for local development:
+
+- MONGODB_URI — MongoDB connection string (e.g. `mongodb://localhost:27017`)
+- MONGODB_DB — Database name (optional if included in URI)
+- NEXT_PUBLIC_AUTH_URL — e.g. `http://localhost:3000`
+- BETTER_AUTH_SECRET — A strong secret (>= 32 chars)
+
+Example (in `.env.local`):
+
+```env
+MONGODB_URI=mongodb://localhost:27017
+MONGODB_DB=better-auth
+NEXT_PUBLIC_AUTH_URL=http://localhost:3000
+BETTER_AUTH_SECRET=replace-with-a-32+ char+secret
+GITHUB_CLIENT_ID=
+GITHUB_CLIENT_SECRET=
+```
+
+## Scripts
+
+- `npm run dev` — Run development server
+- `npm run build` — Build for production
+- `npm run start` — Start production server after build
+- `npm run lint` — Run ESLint
+
+## Database
+
+- For local development, run a local MongoDB instance or use Atlas. Ensure `MONGODB_URI` points to the database.
+- The project uses the MongoDB client in `src/lib/mongodb.ts`. Collections are created automatically as used by Better Auth and the app.
+
+## Linting & Formatting
+
+Run:
+
+```bash
+npm run lint
+```
+
+Prettier or other formatters may be configured in the repo — follow existing configuration.
+
+## Tests
+
+There are no automated tests included by default. If you add tests, prefer the repository's existing tooling and add an npm script (e.g. `test`).
+
+## Deployment
+
+- This is a standard Next.js app and can be deployed to Vercel, Netlify (with Edge Functions), or any Node host that supports Next.js production builds.
+- Typical steps for Vercel:
+  1. Configure environment variables in the Vercel project settings.
+  2. Set the build command to `npm run build` and the output to `npm run start` (or let Vercel detect Next.js).
+
+## Troubleshooting
+
+- If pages fail to load, check the server logs for missing environment variables.
+- If MongoDB connection fails, verify `MONGODB_URI` and network access (firewall/Atlas IP allowlist).
+
+## Contributing
+
+- Please open issues and PRs against the `main` branch.
+- Keep changes small and scoped. Add tests for new behaviors when practical.
+
+## Project structure (short)
 
 ```
 src/
-├── app/                    # Next.js App Router
-│   ├── api/auth/          # Better Auth API routes
-│   ├── auth/              # Authentication pages (login/signup)
-│   ├── todos/             # Todo management page
-│   └── page.tsx           # Landing page
-├── components/            # React components
-│   ├── auth/              # Authentication components
-│   └── ui/                # shadcn/ui components
-├── hooks/                 # Custom React hooks
-├── lib/                   # Core utilities and configuration
-│   ├── auth.ts           # Better Auth configuration
-│   ├── auth-client.ts    # Client-side auth hooks
-│   ├── auth-server.ts    # Server-side auth utilities
-│   ├── actions.ts        # Server actions with auth checks
-│   ├── mongodb.ts        # MongoDB client setup
-│   ├── env.ts            # Environment variable validation
-│   ├── types.ts          # TypeScript definitions
-│   └── utils.ts          # Utility functions (cn, etc.)
-└── middleware.ts          # Route protection middleware
-components.json            # shadcn/ui configuration
-.env.example              # Environment variables template
+├── app/                    # Next.js App Router (pages, api, routes)
+├── components/             # React + shadcn/ui components
+├── hooks/                  # Custom hooks
+├── lib/                    # Auth, DB, utils
+└── middleware.ts           # Route protection middleware
 ```
 
-## Authentication Flow
+## Links & Resources
 
-1. **Landing Page**: Welcome screen that redirects authenticated users to todos
-2. **Registration/Login**: Forms with validation and error handling
-3. **Todo Dashboard**: Protected route at `/todos` with user profile and todo management
-4. **Session Management**: Automatic session handling with Better Auth and middleware protection
+- Better Auth: https://better-auth.com
+- Next.js: https://nextjs.org/docs
+- MongoDB docs: https://docs.mongodb.com
+- shadcn/ui: https://ui.shadcn.com
 
-## API Routes
+---
 
-- `POST /api/auth/*` - Better Auth endpoints (handled automatically)
+If you'd like, I can also add a small `CONTRIBUTING.md` or `.env.example` improvements (commented), or a short checklist for reviewers.
 
-Todo operations are handled via server actions in `src/lib/actions.ts` instead of API routes:
-- `getTodos()` - Fetch user's todos
-- `createTodo()` - Create new todo  
-- `updateTodo()` - Update todo
-- `deleteTodo()` - Delete todo
+## Security
 
-## MongoDB Schema
+Keeping the app secure is important for contributors and deployers. Recommended practices:
 
-The app uses Better Auth's automatic schema creation for users and sessions, plus custom collections for todos with proper user relationships.
+- Keep dependencies up to date. Use `npm outdated`, `npm audit`, and automated tools like Dependabot or Renovate to open PRs for updates.
+- Run `npm audit fix` (carefully) and review any high/critical advisories before merging. For deeper analysis, use Snyk or GitHub Security alerts.
+- Rotate and protect secrets: do not commit secrets to the repo. Store production secrets in your host (Vercel/Netlify/GitHub Actions Secrets).
+- Use a strong `BETTER_AUTH_SECRET` (>= 32 characters) and rotate it if a leak is suspected — note that rotating auth secrets may invalidate existing sessions.
+- Require 2FA on GitHub accounts that have access to the project and review collaborator permissions regularly.
+- Add a GitHub Actions workflow or other CI checks to run `npm audit`, linting, and tests on pull requests.
 
-## Commands
+Quick commands to check security locally:
 
-- `npm run dev` - Start development server with Turbopack
-- `npm run build` - Build for production
-- `npm run start` - Start production server
-- `npm run lint` - Run ESLint
+```bash
+# list outdated packages
+npm outdated
 
-## Learn More
+# run npm audit and attempt an automatic fix
+npm audit
+npm audit fix
+```
 
-- [Better Auth Documentation](https://better-auth.com)
-- [Next.js Documentation](https://nextjs.org/docs)
-- [MongoDB Documentation](https://docs.mongodb.com/?utm_campaign=devrel&utm_source=third-party-content&utm_medium=cta&utm_content=github-better-auth-mongodb&utm_term=jesse.hall)
-- [shadcn/ui Documentation](https://ui.shadcn.com)
+## GitHub OAuth / Login (GitHub sign-in)
+
+This project supports GitHub OAuth for social login. To enable GitHub login locally or in production:
+
+1. Create a GitHub OAuth App on GitHub (Settings → Developer settings → OAuth Apps) or use GitHub Apps depending on your needs.
+  - Set the Authorization callback URL to `http://localhost:3000/api/auth/callback/github` for local development (adjust for your deployment URL in production).
+2. Copy the `Client ID` and `Client Secret` from the OAuth app and set them in `.env.local`:
+
+```env
+GITHUB_CLIENT_ID=your_client_id_here
+GITHUB_CLIENT_SECRET=your_client_secret_here
+```
+
+3. Ensure `NEXT_PUBLIC_AUTH_URL` is set correctly (e.g. `http://localhost:3000`) so redirect URLs match.
+
+Notes:
+- If you see errors during OAuth, check GitHub app settings (redirect URL, allowed domains) and server logs for more details.
+- When deploying to GitHub-backed CI or Vercel, store the `GITHUB_CLIENT_SECRET` in the platform's secret store (never commit it).
+- If you meant a different "GitHub codes" flow (device flow), the project currently uses standard OAuth redirect flow; we can add device flow support if you need it.
+
+---
+
+If you'd like, I can also add a small `CONTRIBUTING.md`, a GitHub Actions security workflow (audit + lint), or enable a Dependabot config file — tell me which you'd prefer and I can add it.
