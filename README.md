@@ -84,7 +84,7 @@ npm run lint
 Prettier or other formatters may be configured in the repo — follow existing configuration.
 
 ## Tests
-
+There's single script for testing the API from OpenRouters free model you have to use Your own key for that too
 There are no automated tests included by default. If you add tests, prefer the repository's existing tooling and add an npm script (e.g. `test`).
 
 ## Deployment
